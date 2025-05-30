@@ -38,7 +38,7 @@ export class NewsOwnerGuard implements CanActivate {
       }
 
       // Проверяем, является ли пользователь автором новости
-      if (news.authorId === user.sub) {
+      if ((news as any).authorId === user.sub) {
         return true;
       }
     }

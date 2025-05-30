@@ -20,6 +20,7 @@ import { CreateNewsDto } from '../dto/create-news.dto';
 import { UpdateNewsDto } from '../dto/update-news.dto';
 import { NewsFilterDto } from '../dto/news-filter.dto';
 import { News } from '../entities/news.entity';
+import { UnifiedNews } from '../interfaces/unified-news.interface';
 
 /**
  * Контроллер для работы с новостями
@@ -43,25 +44,26 @@ export class NewsController {
   ): Promise<News> {
     return this.newsService.create(createNewsDto, req.user);
   }
-
   /**
    * Получение списка новостей с возможностью фильтрации
    * @param filterDto DTO с параметрами фильтрации
    * @returns Массив новостей
    */
   @Get()
-  async findAll(@Query() filterDto: NewsFilterDto): Promise<News[]> {
+  async findAll(@Query() filterDto: NewsFilterDto): Promise<UnifiedNews[]> {
     return this.newsService.findAll(filterDto);
   }
-
   /**
    * Получение информации о новости по ID
-   * @param id ID новости
+   * @param id ID новости (число для локальных, строка для внешних)
    * @returns Новость
    */
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<News> {
-    return this.newsService.findOne(+id);
+  async findOne(@Param('id') id: string): Promise<News | UnifiedNews> {
+    // Пытаемся преобразовать в число, если это возможно
+    const numericId = Number(id);
+    const actualId = isNaN(numericId) ? id : numericId;
+    return this.newsService.findOne(actualId);
   }
 
   /**

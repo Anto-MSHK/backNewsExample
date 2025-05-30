@@ -1,4 +1,9 @@
-import { IsDateString, IsNumberString, IsOptional } from 'class-validator';
+import {
+  IsDateString,
+  IsNumberString,
+  IsOptional,
+  IsIn,
+} from 'class-validator';
 
 /**
  * DTO для фильтрации новостей по различным параметрам
@@ -31,4 +36,12 @@ export class NewsFilterDto {
   @IsOptional()
   @IsDateString({}, { message: 'Некорректный формат конечной даты' })
   endDate?: string;
+  /**
+   * Тип источника: local, external, all
+   */
+  @IsOptional()
+  @IsIn(['local', 'external', 'all'], {
+    message: 'Тип источника должен быть local, external или all',
+  })
+  sourceType?: 'local' | 'external' | 'all';
 }

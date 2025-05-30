@@ -6,6 +6,7 @@ import { NewsController } from './controllers/news.controller';
 import { UsersModule } from '../users/users.module';
 import { CategoriesModule } from '../categories/categories.module';
 import { AgenciesModule } from '../agencies/agencies.module';
+import { ExternalNewsService } from './services/external-news.service';
 
 /**
  * Модуль новостей
@@ -19,7 +20,7 @@ import { AgenciesModule } from '../agencies/agencies.module';
     AgenciesModule,
   ],
   controllers: [NewsController],
-  providers: [NewsService],
+  providers: [NewsService, ExternalNewsService],
   exports: [NewsService],
 })
 export class NewsModule {}
