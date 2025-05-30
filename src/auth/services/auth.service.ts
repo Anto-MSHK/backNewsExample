@@ -5,6 +5,9 @@ import { UsersService } from '../../users/services/users.service';
 import { LoginDto } from '../dto/login.dto';
 import { LoginResponseDto } from '../dto/login-response.dto';
 import { JwtPayloadDto } from '../dto/jwt-payload.dto';
+import { RegisterDto } from '../dto/register.dto';
+import { RegisterResponseDto } from '../dto/register-response.dto';
+import { UserRole } from '../../common/enums/user-role.enum';
 
 /**
  * Сервис для работы с аутентификацией
@@ -15,7 +18,6 @@ export class AuthService {
     private usersService: UsersService,
     private jwtService: JwtService,
   ) {}
-
   /**
    * Авторизация пользователя
    * @param loginDto DTO с данными для входа
@@ -33,6 +35,40 @@ export class AuthService {
 
     return {
       accessToken: this.jwtService.sign(payload),
+    };
+  }
+
+  /**
+   * Регистрация нового пользователя
+   * @param registerDto DTO с данными для регистрации
+   * @returns Объект с данными пользователя и JWT токеном
+   */
+  async register(registerDto: RegisterDto): Promise<RegisterResponseDto> {
+    // Создаем нового пользователя с ролью READER по умолчанию
+    const newUser = await this.usersService.create({
+      username: registerDto.username,
+      password: registerDto.password,
+      email: registerDto.email,
+      role: UserRole.READER, // По умолчанию все новые пользователи - читатели
+    });
+
+    // Создаем JWT токен для автоматической авторизации
+    const payload: JwtPayloadDto = {
+      sub: newUser.id,
+      username: newUser.username,
+      role: newUser.role,
+      agencyId: newUser.agencyId as number,
+    };
+
+    const accessToken = this.jwtService.sign(payload);
+
+    return {
+      id: newUser.id,
+      username: newUser.username,
+      email: newUser.email,
+      role: newUser.role,
+      accessToken,
+      message: 'Пользователь успешно зарегистрирован',
     };
   }
 
